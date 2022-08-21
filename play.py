@@ -11,6 +11,14 @@ gameicon = pygame.image.load('assets/scene/gameicon.png').convert_alpha()
 pygame.display.set_icon(gameicon)
 clock = pygame.time.Clock()
 
+# Rendering game scene
+background_scene = pygame.image.load('assets/scene/background.png').convert()
+background_scene = pygame.transform.scale(background_scene, (width, height))
+floor_scene = pygame.image.load('assets/scene/floor.png').convert()
+floor_scene = pygame.transform.scale2x(floor_scene)
+win.blit(background_scene, (0, 0))
+win.blit(floor_scene, (0, 670))
+
 while run:
     # setting up game events
     for event in pygame.event.get():
