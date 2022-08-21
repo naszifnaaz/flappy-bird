@@ -7,3 +7,4 @@ fps = 120
 
 # Gameplay constants
 run = True
+dynamic_floor = 0
