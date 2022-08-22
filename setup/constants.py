@@ -1,14 +1,14 @@
 # Game setup
 
 # Window constants
-width = 524
-height = 800
-fps = 120
+WIDTH = 524
+HEIGHT = 800
+FPS = 120
 
 # Gameplay constants
-run = True
+RUN = True
 
 # Game Physics
-dynamic_floor = 0
-gravity = 0.25
-bird_velocity = 0
+DYNAMIC_FLOOR = 0
+GRAVITY = 0.20
+BIRD_VELOCITY = 0
