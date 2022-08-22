@@ -22,11 +22,37 @@ bird_sprite = pygame.image.load('assets/sprites/bird_mid.png').convert()
 bird_sprite = pygame.transform.scale2x(bird_sprite)
 bird_hitbox = bird_sprite.get_rect(center=(100, 400))
 
+# Drawing pipe obstacles
+pipe_sprite = pygame.image.load('assets/sprites/pipe.png').convert()
+pipe_sprite = pygame.transform.scale2x(pipe_sprite)
+pipe_list = []
+SPAWNPIPE = pygame.USEREVENT
+pygame.time.set_timer(SPAWNPIPE, 1200)
+
 
 # Drawing dynamic floor
 def draw_floor():
-    win.blit(floor_scene, (dynamic_floor, 670))
-    win.blit(floor_scene, (dynamic_floor + 500, 670))
+    win.blit(floor_scene, (dynamic_floor, 700))
+    win.blit(floor_scene, (dynamic_floor + 500, 700))
+
+
+# Drawing new pipe
+def create_pipe():
+    new_pipe = pipe_sprite.get_rect(midtop=(700, 400))
+    return new_pipe
+
+
+# Dynamic obstacles
+def move_pipe(pipes):
+    for pipe in pipes:
+        pipe.centerx -= 5
+    return pipes
+
+
+# Rendering pipes
+def draw_pipe(pipes):
+    for pipe in pipes:
+        win.blit(pipe_sprite, pipe)
 
 
 # Game loop
@@ -42,14 +68,21 @@ while run:
                 bird_velocity = 0
                 bird_velocity -= 10
 
-    # dynamic floor
+        if event.type == SPAWNPIPE:
+            pipe_list.append(create_pipe())
+
     win.blit(background_scene, (0, 0))
 
     # implementing bird physics
     bird_velocity += gravity
     bird_hitbox.centery += bird_velocity
-
     win.blit(bird_sprite, bird_hitbox)
+
+    # rendering obstacles
+    pipe_list = move_pipe(pipe_list)
+    draw_pipe(pipe_list)
+
+    # dynamic floor
     dynamic_floor -= 1
     draw_floor()
     if dynamic_floor <= -500:
