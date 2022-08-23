@@ -19,8 +19,15 @@ floor_scene = pygame.image.load('assets/scene/floor.png').convert()
 floor_scene = pygame.transform.scale2x(floor_scene)
 
 # Loading bird sprites
-bird_sprite = pygame.image.load('assets/sprites/bird_mid.png').convert()
-bird_sprite = pygame.transform.scale2x(bird_sprite)
+bird_downflap = pygame.transform.scale2x(pygame.image.load(
+    'assets/sprites/bird_down.png').convert_alpha())
+bird_midflap = pygame.transform.scale2x(pygame.image.load(
+    'assets/sprites/bird_mid.png').convert_alpha())
+bird_upflap = pygame.transform.scale2x(pygame.image.load(
+    'assets/sprites/bird_up.png').convert_alpha())
+bird_frames = [bird_downflap, bird_midflap, bird_upflap]
+bird_index = 0
+bird_sprite = bird_frames[bird_index]
 bird_hitbox = bird_sprite.get_rect(center=(100, 400))
 
 # Drawing pipe obstacles
@@ -30,6 +37,10 @@ pipe_list = []
 pipe_height = [200, 400, 550]
 SPAWNPIPE = pygame.USEREVENT
 pygame.time.set_timer(SPAWNPIPE, 1500)
+
+# Bird flap event
+BIRD_FLAP = pygame.USEREVENT + 1
+pygame.time.set_timer(BIRD_FLAP, 200)
 
 
 # Drawing dynamic floor
@@ -68,9 +79,22 @@ def check_collision(pipes):
     for pipe in pipes:
         if bird_hitbox.colliderect(pipe):
             return False
-    if bird_hitbox.top <= -100 or bird_hitbox.bottom >= 700:
+    if bird_hitbox.top <= -150 or bird_hitbox.bottom >= 700:
         return False
     return True
+
+
+# Animating bird
+def rotate_bird(bird):
+    new_bird = pygame.transform.rotozoom(bird, -BIRD_VELOCITY * 3, 1)
+    return new_bird
+
+
+# Bird flap animation
+def bird_animation():
+    new_bird = bird_frames[bird_index]
+    new_bird_rect = new_bird.get_rect(center=(100, bird_hitbox.centery))
+    return new_bird, new_bird_rect
 
 
 # Game loop
@@ -92,8 +116,17 @@ while RUN:
                 bird_hitbox.center = (100, 400)
                 BIRD_VELOCITY = 0
 
+        # spawning obstacles
         if event.type == SPAWNPIPE:
             pipe_list.extend(create_pipe())
+
+        # bird flap event
+        if event.type == BIRD_FLAP:
+            if bird_index < 2:
+                bird_index += 1
+            else:
+                bird_index = 0
+            bird_sprite, bird_hitbox = bird_animation()
 
     win.blit(background_scene, (0, 0))
 
@@ -102,7 +135,8 @@ while RUN:
         # implementing bird physics
         BIRD_VELOCITY += GRAVITY
         bird_hitbox.centery += BIRD_VELOCITY
-        win.blit(bird_sprite, bird_hitbox)
+        rotated_sprite = rotate_bird(bird_sprite)
+        win.blit(rotated_sprite, bird_hitbox)
         GAME_ACTIVE = check_collision(pipe_list)
 
         # rendering obstacles

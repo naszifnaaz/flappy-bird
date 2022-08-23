@@ -7,9 +7,9 @@ FPS = 120
 
 # Gameplay constants
 RUN = True
+GAME_ACTIVE = True
 
 # Game Physics
 DYNAMIC_FLOOR = 0
 GRAVITY = 0.20
 BIRD_VELOCITY = 0
-GAME_ACTIVE = True
