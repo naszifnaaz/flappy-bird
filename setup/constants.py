@@ -8,6 +8,9 @@ FPS = 120
 # Gameplay constants
 RUN = True
 GAME_ACTIVE = True
+SCORE = 0
+HIGH_SCORE = 0
+WHITE = (255,255,255)
 
 # Game Physics
 DYNAMIC_FLOOR = 0

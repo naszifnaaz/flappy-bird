@@ -18,6 +18,9 @@ background_scene = pygame.transform.scale(background_scene, (WIDTH, HEIGHT))
 floor_scene = pygame.image.load('assets/scene/floor.png').convert()
 floor_scene = pygame.transform.scale2x(floor_scene)
 
+# Loading fonts
+game_font = pygame.font.Font('assets/fonts/flappy.ttf', 40)
+
 # Loading bird sprites
 bird_downflap = pygame.transform.scale2x(pygame.image.load(
     'assets/sprites/bird_down.png').convert_alpha())
@@ -29,6 +32,12 @@ bird_frames = [bird_downflap, bird_midflap, bird_upflap]
 bird_index = 0
 bird_sprite = bird_frames[bird_index]
 bird_hitbox = bird_sprite.get_rect(center=(100, 400))
+
+# Gameover scene
+gameover_scene = pygame.image.load(
+    'assets/scene/onset.png').convert_alpha()
+gameover_scene = pygame.transform.scale2x(gameover_scene)
+gameover_rect = gameover_scene.get_rect(center=(262, 400))
 
 # Drawing pipe obstacles
 pipe_sprite = pygame.image.load('assets/sprites/pipe.png').convert()
@@ -97,6 +106,31 @@ def bird_animation():
     return new_bird, new_bird_rect
 
 
+# Current game score
+def score_display(game_active):
+    if game_active == 'main_game':
+        score_surface = game_font.render(str(int(SCORE)), True, WHITE)
+        score_rect = score_surface.get_rect(center=(262, 100))
+        win.blit(score_surface, score_rect)
+
+    if game_active == 'game_over':
+        score_surface = game_font.render(f'Score: {int(SCORE)}', True, WHITE)
+        score_rect = score_surface.get_rect(center=(262, 100))
+        win.blit(score_surface, score_rect)
+
+        HIGHSCORE_surface = game_font.render(
+            f'High Score: {int(HIGH_SCORE)}', True, WHITE)
+        HIGHSCORE_rect = score_surface.get_rect(center=(200, 685))
+        win.blit(HIGHSCORE_surface, HIGHSCORE_rect)
+
+
+# High Score
+def update_score(SCORE, HIGH_SCORE):
+    if SCORE > HIGH_SCORE:
+        HIGH_SCORE = SCORE
+    return HIGH_SCORE
+
+
 # Game loop
 while RUN:
     # setting up game events
@@ -115,6 +149,7 @@ while RUN:
                 pipe_list.clear()
                 bird_hitbox.center = (100, 400)
                 BIRD_VELOCITY = 0
+                SCORE = 0
 
         # spawning obstacles
         if event.type == SPAWNPIPE:
@@ -142,6 +177,15 @@ while RUN:
         # rendering obstacles
         pipe_list = move_pipe(pipe_list)
         draw_pipe(pipe_list)
+
+        SCORE += 0.01
+        score_display('main_game')
+    else:
+
+        # game over scene with scores
+        win.blit(gameover_scene, gameover_rect)
+        HIGH_SCORE = update_score(SCORE, HIGH_SCORE)
+        score_display('game_over')
 
     # dynamic floor
     DYNAMIC_FLOOR -= 1
