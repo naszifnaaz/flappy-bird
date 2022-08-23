@@ -27,7 +27,7 @@ bird_hitbox = bird_sprite.get_rect(center=(100, 400))
 pipe_sprite = pygame.image.load('assets/sprites/pipe.png').convert()
 pipe_sprite = pygame.transform.scale2x(pipe_sprite)
 pipe_list = []
-pipe_height = [200, 400, 600]
+pipe_height = [200, 400, 550]
 SPAWNPIPE = pygame.USEREVENT
 pygame.time.set_timer(SPAWNPIPE, 1500)
 
@@ -42,7 +42,7 @@ def draw_floor():
 def create_pipe():
     random_pipe = random.choice(pipe_height)
     bottom_pipe = pipe_sprite.get_rect(midtop=(700, random_pipe))
-    top_pipe = pipe_sprite.get_rect(midbottom=(700, random_pipe - 220))
+    top_pipe = pipe_sprite.get_rect(midbottom=(700, random_pipe - 250))
     return bottom_pipe, top_pipe
 
 
@@ -63,6 +63,16 @@ def draw_pipe(pipes):
             win.blit(flip_pipe, pipe)
 
 
+# Collision detection
+def check_collision(pipes):
+    for pipe in pipes:
+        if bird_hitbox.colliderect(pipe):
+            return False
+    if bird_hitbox.top <= -100 or bird_hitbox.bottom >= 700:
+        return False
+    return True
+
+
 # Game loop
 while RUN:
     # setting up game events
@@ -72,23 +82,32 @@ while RUN:
             sys.exit()
 
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
+            if event.key == pygame.K_SPACE and GAME_ACTIVE == True:
                 BIRD_VELOCITY = 0
                 BIRD_VELOCITY -= 8
+
+            if event.key == pygame.K_SPACE and GAME_ACTIVE == False:
+                GAME_ACTIVE = True
+                pipe_list.clear()
+                bird_hitbox.center = (100, 400)
+                BIRD_VELOCITY = 0
 
         if event.type == SPAWNPIPE:
             pipe_list.extend(create_pipe())
 
     win.blit(background_scene, (0, 0))
 
-    # implementing bird physics
-    BIRD_VELOCITY += GRAVITY
-    bird_hitbox.centery += BIRD_VELOCITY
-    win.blit(bird_sprite, bird_hitbox)
+    if GAME_ACTIVE:
 
-    # rendering obstacles
-    pipe_list = move_pipe(pipe_list)
-    draw_pipe(pipe_list)
+        # implementing bird physics
+        BIRD_VELOCITY += GRAVITY
+        bird_hitbox.centery += BIRD_VELOCITY
+        win.blit(bird_sprite, bird_hitbox)
+        GAME_ACTIVE = check_collision(pipe_list)
+
+        # rendering obstacles
+        pipe_list = move_pipe(pipe_list)
+        draw_pipe(pipe_list)
 
     # dynamic floor
     DYNAMIC_FLOOR -= 1
