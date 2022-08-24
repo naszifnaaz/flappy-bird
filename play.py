@@ -33,6 +33,11 @@ bird_index = 0
 bird_sprite = bird_frames[bird_index]
 bird_hitbox = bird_sprite.get_rect(center=(100, 400))
 
+# Loading game sounds
+flap_sound = pygame.mixer.Sound('assets/sounds/flap.ogg')
+clash_sound = pygame.mixer.Sound('assets/sounds/clash.ogg')
+score_sound = pygame.mixer.Sound('assets/sounds/score.ogg')
+
 # Gameover scene
 gameover_scene = pygame.image.load(
     'assets/scene/onset.png').convert_alpha()
@@ -87,8 +92,12 @@ def draw_pipe(pipes):
 def check_collision(pipes):
     for pipe in pipes:
         if bird_hitbox.colliderect(pipe):
+            clash_sound.play()
+            pygame.time.delay(300)
             return False
     if bird_hitbox.top <= -150 or bird_hitbox.bottom >= 700:
+        clash_sound.play()
+        pygame.time.delay(300)
         return False
     return True
 
@@ -143,6 +152,7 @@ while RUN:
             if event.key == pygame.K_SPACE and GAME_ACTIVE == True:
                 BIRD_VELOCITY = 0
                 BIRD_VELOCITY -= 8
+                flap_sound.play()
 
             if event.key == pygame.K_SPACE and GAME_ACTIVE == False:
                 GAME_ACTIVE = True
