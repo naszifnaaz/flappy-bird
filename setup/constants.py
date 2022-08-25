@@ -10,7 +10,8 @@ RUN = True
 GAME_ACTIVE = True
 SCORE = 0
 HIGH_SCORE = 0
-WHITE = (255,255,255)
+WHITE = (255, 255, 255)
+CAN_SCORE = True
 
 # Game Physics
 DYNAMIC_FLOOR = 0
