@@ -22,12 +22,9 @@ floor_scene = pygame.transform.scale2x(floor_scene)
 game_font = pygame.font.Font('assets/fonts/flappy.ttf', 40)
 
 # Loading bird sprites
-bird_downflap = pygame.transform.scale2x(pygame.image.load(
-    'assets/sprites/bird_down.png').convert_alpha())
-bird_midflap = pygame.transform.scale2x(pygame.image.load(
-    'assets/sprites/bird_mid.png').convert_alpha())
-bird_upflap = pygame.transform.scale2x(pygame.image.load(
-    'assets/sprites/bird_up.png').convert_alpha())
+bird_downflap = pygame.transform.scale2x(pygame.image.load('assets/sprites/bird_down.png').convert_alpha())
+bird_midflap = pygame.transform.scale2x(pygame.image.load('assets/sprites/bird_mid.png').convert_alpha())
+bird_upflap = pygame.transform.scale2x(pygame.image.load('assets/sprites/bird_up.png').convert_alpha())
 bird_frames = [bird_downflap, bird_midflap, bird_upflap]
 bird_index = 0
 bird_sprite = bird_frames[bird_index]
@@ -39,8 +36,7 @@ clash_sound = pygame.mixer.Sound('assets/sounds/clash.ogg')
 score_sound = pygame.mixer.Sound('assets/sounds/score.ogg')
 
 # Gameover scene
-gameover_scene = pygame.image.load(
-    'assets/scene/onset.png').convert_alpha()
+gameover_scene = pygame.image.load('assets/scene/onset.png').convert_alpha()
 gameover_scene = pygame.transform.scale2x(gameover_scene)
 gameover_rect = gameover_scene.get_rect(center=(262, 400))
 
@@ -56,12 +52,10 @@ pygame.time.set_timer(SPAWNPIPE, 1500)
 BIRD_FLAP = pygame.USEREVENT + 1
 pygame.time.set_timer(BIRD_FLAP, 200)
 
-
 # Drawing dynamic floor
 def draw_floor():
     win.blit(floor_scene, (DYNAMIC_FLOOR, 700))
     win.blit(floor_scene, (DYNAMIC_FLOOR + 500, 700))
-
 
 # Drawing new pipe
 def create_pipe():
@@ -70,13 +64,12 @@ def create_pipe():
     top_pipe = pipe_sprite.get_rect(midbottom=(700, random_pipe - 250))
     return bottom_pipe, top_pipe
 
-
 # Dynamic obstacles
 def move_pipe(pipes):
     for pipe in pipes:
         pipe.centerx -= 5
-    return pipes
-
+    visible_pipes = [pipe for pipe in pipes if pipe.right > -50]
+    return visible_pipes
 
 # Rendering pipes
 def draw_pipe(pipes):
@@ -87,33 +80,32 @@ def draw_pipe(pipes):
             flip_pipe = pygame.transform.flip(pipe_sprite, False, True)
             win.blit(flip_pipe, pipe)
 
-
 # Collision detection
 def check_collision(pipes):
+    global CAN_SCORE
     for pipe in pipes:
         if bird_hitbox.colliderect(pipe):
             clash_sound.play()
             pygame.time.delay(300)
+            CAN_SCORE = True
             return False
     if bird_hitbox.top <= -150 or bird_hitbox.bottom >= 700:
         clash_sound.play()
         pygame.time.delay(300)
+        CAN_SCORE = True
         return False
     return True
-
 
 # Animating bird
 def rotate_bird(bird):
     new_bird = pygame.transform.rotozoom(bird, -BIRD_VELOCITY * 3, 1)
     return new_bird
 
-
 # Bird flap animation
 def bird_animation():
     new_bird = bird_frames[bird_index]
     new_bird_rect = new_bird.get_rect(center=(100, bird_hitbox.centery))
     return new_bird, new_bird_rect
-
 
 # Current game score
 def score_display(game_active):
@@ -132,13 +124,11 @@ def score_display(game_active):
         HIGHSCORE_rect = score_surface.get_rect(center=(200, 685))
         win.blit(HIGHSCORE_surface, HIGHSCORE_rect)
 
-
 # High Score
 def update_score(SCORE, HIGH_SCORE):
     if SCORE > HIGH_SCORE:
         HIGH_SCORE = SCORE
     return HIGH_SCORE
-
 
 # Enhanced Scoring System
 def pipe_score_check():
@@ -153,7 +143,6 @@ def pipe_score_check():
 
             if pipe.centerx < 0:
                 CAN_SCORE = True
-
 
 # Game loop
 while RUN:
@@ -187,11 +176,9 @@ while RUN:
             else:
                 bird_index = 0
             bird_sprite, bird_hitbox = bird_animation()
-
     win.blit(background_scene, (0, 0))
 
     if GAME_ACTIVE:
-
         # implementing bird physics
         BIRD_VELOCITY += GRAVITY
         bird_hitbox.centery += BIRD_VELOCITY
@@ -207,7 +194,6 @@ while RUN:
         pipe_score_check()
         score_display('main_game')
     else:
-
         # game over scene with scores
         win.blit(gameover_scene, gameover_rect)
         HIGH_SCORE = update_score(SCORE, HIGH_SCORE)
